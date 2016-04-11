@@ -202,14 +202,21 @@ class Matrix:
 
     def __str__(self):
         """
-        Returns the string representation of the current
-        matrix instance.
+        Returns the JSON encoded string value of this matrix.
         """
-        ret = ""
+        ret = "["
         for i in range(0, self.__rows):
             for j in range(0, self.__cols):
-                ret += str(self.__matrix[i][j]) + " "
-            ret += "\n"
+                if j == 0:
+                    ret += "["
+                ret += str(self.__matrix[i][j])
+                if j != self.__cols - 1:
+                    ret +=", "
+                if j == self.__cols - 1:
+                    ret += "]"
+
+            ret += "]" if i < self.__rows - 1 else "],"
+
         return ret
 
 class util:
