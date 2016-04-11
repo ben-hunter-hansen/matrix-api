@@ -22,8 +22,8 @@ def doMultiply():
         abort(400)
 
     operands = request.json['operands']
-    matrixA = Matrix.fromArray(eval(operands['rvalue']))
-    matrixB = Matrix.fromArray(eval(operands['lvalue']))
+    matrixA = Matrix.fromArray(eval(operands['lvalue']))
+    matrixB = Matrix.fromArray(eval(operands['rvalue']))
     result = {
         'product': str(matrixA * matrixB)
     }
