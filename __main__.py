@@ -1,20 +1,19 @@
 
 from app.matrix import Matrix
-from app import tests
 
 def main():
-    tests.run()
     A = Matrix.fromArray([
-        [1,2,3],
-        [4,5,6],
-        [7,8,9]
+        [0,2,3],
+        [4,2,6],
+        [4,5,6]
     ])
     B = Matrix.fromArray([
-        [1,2,3],
-        [4,5,6],
-        [7,8,9]
+        [4, 9, 6],
+        [7, 8, 1],
+        [0, 13,2]
     ])
-    print(A * B.transpose())
+    print(A - B)
+    print(A.determinant())
 
 
 if __name__ == "__main__":

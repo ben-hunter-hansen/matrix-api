@@ -8,7 +8,7 @@ Test specification for the mathutil module.
 """
 
 import unittest
-import app.util.math
+from app.util import math
 
 class MathUtilSpec(unittest.TestCase):
     def testDotProduct(self):

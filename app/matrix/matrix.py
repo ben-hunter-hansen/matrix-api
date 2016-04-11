@@ -4,7 +4,7 @@ matrix-api v0.1
 @created on 04/10/2016
 matrix.py
 """
-
+import copy
 from app.decorators import require
 from app.util import math
 
@@ -22,7 +22,7 @@ class Matrix:
         @param cols (int)   Number of columns in the matrix. Default: 3
 
         """
-        self.__matrix = [[0 for x in range(cols)] for x in range(rows)]
+        self.__matrix = [[0 for x in range(rows)] for x in range(cols)]
         self.__rows = rows
         self.__cols = cols
 
@@ -75,13 +75,17 @@ class Matrix:
         """
         return Matrix.fromArray([[0 for x in range(cols)] for x in range(rows)])
 
+    @staticmethod
+    def dim(A):
+        return (A.rows(), A.columns())
+
     def rows(self):
         """
         Gets the number of rows in the current matrix instance.
 
         @return (int)   Row count.
         """
-        return len(self.__matrix)
+        return len(list(self[0]))
 
     def columns(self):
         """
@@ -89,7 +93,8 @@ class Matrix:
 
         @return (int)   Column count.
         """
-        return len(self.__matrix[0])
+        return len(list(self))
+
 
     def transpose(self):
         """
@@ -98,20 +103,85 @@ class Matrix:
         """
         return Matrix.fromArray([list(x) for x in zip(*self.__matrix)])
 
+
+    def determinant(self):
+        """
+        Computes the determinant of the current Matrix instance
+        by cofactors.
+        @return (int|None)  The determinant if the matrix is square, else None
+        """
+
+        if self.rows() != self.columns():
+            return None
+
+        def minor(matrix, i):
+            minor = copy.deepcopy(matrix)
+            del minor[0]
+            for b in range(len(matrix)-1):
+                del minor[b][i]
+            return minor
+
+        def det(matrix):
+            if len(matrix) == 1:
+                return matrix[0][0]
+            else:
+                determinant = 0
+                for x in range(len(matrix)):
+                    determinant += matrix[0][x] * (-1)**(2+x) * det(minor(matrix,x))
+                return determinant
+
+        return det(self.__matrix)
+
     def __mul__(self, other):
         """
-        Computes the matrix product of the current instance, and
-        another Matrix.
+        Computes the matrix product of the current
+        matrix and another, with the constraint that
+        the number of rows in this matrix is equal to
+        the columns of the other.
 
-        @param self  (Matrix)    Current instance, right operand.
-        @param other (Matrix)    Other matrix, left operand.
-        @return      (Matrix)    The matrix product A*B
+        @param self  (Matrix)       Current instance, right operand.
+        @param other (Matrix)       Other matrix, left operand.
+        @return      (Matrix|None)   The matrix product A*B, else None
         """
+        if self.rows() != other.columns():
+            return None
+
         product = Matrix(self.rows(), other.columns())
         for i in range(0, product.rows()):
             for j in range(0, product.columns()):
                 product[i][j] = math.dot(self[i], other.transpose()[j])
         return product
+
+    def __add__(self, other):
+        """
+        Computes the sum of the current matrix instance and another,
+        with the constraint that the dimensions of each operand are
+        equivalent.  If they are not, return None.
+
+        @param self  (Matrix)       Current instance, right operand.
+        @param other (Matrix)       Other matrix, left operand.
+        @return      (Matrix|None)  The sum, else None
+        """
+        if Matrix.dim(self) != Matrix.dim(other):
+            return None
+
+        return Matrix.fromArray([[a + b for a, b in zip(row1, row2)] for row1, row2 in zip(self,other)])
+
+    def __sub__(self, other):
+        """
+        Computes the difference of the current matrix instance and another,
+        with the constraint that the dimensions of each operand are
+        equivalent.  If they are not, return None.
+
+        @param self  (Matrix)       Current instance, right operand.
+        @param other (Matrix)       Other matrix, left operand.
+        @return      (Matrix|None)  The difference, else None
+        """
+        if Matrix.dim(self) != Matrix.dim(other):
+            return None
+
+        return Matrix.fromArray([[a - b for a, b in zip(row1, row2)] for row1, row2 in zip(self,other)])
+
 
     def __getitem__(self,index):
         """
