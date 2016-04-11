@@ -6,7 +6,6 @@ matrix.py
 """
 import copy
 from app.decorators import require
-from app.util import math
 
 class Matrix:
     """
@@ -149,7 +148,7 @@ class Matrix:
         product = Matrix(self.rows(), other.columns())
         for i in range(0, product.rows()):
             for j in range(0, product.columns()):
-                product[i][j] = math.dot(self[i], other.transpose()[j])
+                product[i][j] = util.dot(self[i], other.transpose()[j])
         return product
 
     def __add__(self, other):
@@ -162,7 +161,7 @@ class Matrix:
         @param other (Matrix)       Other matrix, left operand.
         @return      (Matrix|None)  The sum, else None
         """
-        if Matrix.dim(self) != Matrix.dim(other):
+        if util.dimension(self) != util.dimension(other):
             return None
 
         return Matrix.fromArray([[a + b for a, b in zip(row1, row2)] for row1, row2 in zip(self,other)])
@@ -177,7 +176,7 @@ class Matrix:
         @param other (Matrix)       Other matrix, left operand.
         @return      (Matrix|None)  The difference, else None
         """
-        if Matrix.dim(self) != Matrix.dim(other):
+        if util.dimension(self) != util.dimension(other):
             return None
 
         return Matrix.fromArray([[a - b for a, b in zip(row1, row2)] for row1, row2 in zip(self,other)])
@@ -212,3 +211,28 @@ class Matrix:
                 ret += str(self.__matrix[i][j]) + " "
             ret += "\n"
         return ret
+
+class util:
+    """
+    Namespace for utility functions that arent directly
+    associated with a Matrix, or matrix instance.
+    """
+    @staticmethod
+    @require(u = list, v = list)
+    def dot(u, v):
+        """
+        Given two vectors represented as
+        one dimensional lists, return their
+        dot product.
+
+        @param u  (list)      First vector.
+        @param v  (list)      Second vector.
+        @return   (number)    The dot product of u and v
+
+        """
+        return sum(p * q for p, q in zip(u, v))
+
+    @staticmethod
+    @require(A = Matrix)
+    def dimension(A):
+        return (A.rows(), A.columns())

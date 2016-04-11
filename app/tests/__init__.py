@@ -1,3 +1,3 @@
-from .mathutilspec import MathUtilSpec
 from .matrixspec import MatrixSpec
+from .utilspec import UtilSpec
 from .runner import run
