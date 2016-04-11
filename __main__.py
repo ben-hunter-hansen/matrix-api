@@ -13,7 +13,7 @@ api = Flask(__name__)
 
 @api.route('/v1/identity')
 def getIdentity():
-    return str(Matrix.identity())
+    return jsonify({'result': str(Matrix.identity())})
 
 
 @api.route('/v1/multiply', methods=["POST"])

@@ -214,8 +214,7 @@ class Matrix:
                     ret +=", "
                 if j == self.__cols - 1:
                     ret += "]"
-
-            ret += "]" if i < self.__rows - 1 else "],"
+            ret += "]," if i < self.__rows - 1 else "]"
 
         return ret
 
