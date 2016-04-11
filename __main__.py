@@ -15,6 +15,16 @@ api = Flask(__name__)
 def getIdentity():
     return jsonify({'result': str(Matrix.identity())})
 
+@api.route('/v1/determinant', methods=["POST"])
+def doDeterminant():
+    if not request.json or not 'matrix' in request.json:
+        abort(400)
+
+    matrix = Matrix.fromArray(eval(request.json['matrix']))
+    result = {
+        'determinant': str(matrix.determinant())
+    }
+    return jsonify({'result': result})
 
 @api.route('/v1/multiply', methods=["POST"])
 def doMultiply():
