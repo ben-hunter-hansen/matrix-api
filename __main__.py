@@ -16,5 +16,9 @@ api.register_blueprint(determinant)
 api.register_blueprint(multiply)
 
 
+@api.errorhandler(422)
+def badRequest(error):
+    return jsonify(error.description), 400
+
 if __name__ == "__main__":
     api.run(debug = True)

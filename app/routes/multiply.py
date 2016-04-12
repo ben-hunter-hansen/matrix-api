@@ -10,19 +10,18 @@ POST /v1/multiply
 
 from flask import Flask, Blueprint, abort, request, jsonify
 from app.matrix import Matrix
+from app.decorators import validate
+import app.schema
 
 multiply = Blueprint('multiply', __name__)
 
 
+@multiply.before_request
+@validate(request, app.schema.multiply)
+def buildMatricies(model):
+    request.matrixA = Matrix.fromArray(model['lvalue'])
+    request.matrixB = Matrix.fromArray(model['rvalue'])
+
 @multiply.route('/v1/multiply', methods=["POST"])
 def postMultiply():
-    if not request.json or not 'operands' in request.json:
-        abort(400)
-
-    operands = request.json['operands']
-    matrixA = Matrix.fromArray(eval(operands['lvalue']))
-    matrixB = Matrix.fromArray(eval(operands['rvalue']))
-    result = {
-        'product': str(matrixA * matrixB)
-    }
-    return jsonify({'result': result})
+    return jsonify((request.matrixA * request.matrixB).toKeyValuePair('result'))

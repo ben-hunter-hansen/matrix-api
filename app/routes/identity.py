@@ -15,4 +15,4 @@ identity = Blueprint('identity', __name__)
 
 @identity.route('/v1/identity')
 def getIdentity():
-    return jsonify({'result': str(Matrix.identity())})
+    return jsonify(Matrix.identity().toKeyValuePair('identity'))

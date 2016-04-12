@@ -1,1 +1,1 @@
-from .decorators import require
+from .decorators import require, validate

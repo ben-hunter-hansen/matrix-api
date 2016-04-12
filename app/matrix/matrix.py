@@ -5,6 +5,7 @@ matrix-api v0.1
 matrix.py
 """
 import copy
+import json
 from app.decorators import require
 
 class Matrix:
@@ -131,6 +132,18 @@ class Matrix:
 
         return det(self.__matrix)
 
+    @require(key = str)
+    def toKeyValuePair(self, key):
+        """
+        Returns a single key/value pair where the key
+        is specified by the caller, and the value is
+        the string represtation of the current matrix.
+
+        @param key (str)    The key
+        @Returns   (dict)   Key/value pair
+        """
+        return { key: str(self) }
+
     def __mul__(self, other):
         """
         Computes the matrix product of the current
@@ -140,7 +153,7 @@ class Matrix:
 
         @param self  (Matrix)       Current instance, right operand.
         @param other (Matrix)       Other matrix, left operand.
-        @return      (Matrix|None)   The matrix product A*B, else None
+        @return      (Matrix|None)  The matrix product A*B, else None
         """
         if self.rows() != other.columns():
             return None
@@ -204,19 +217,7 @@ class Matrix:
         """
         Returns the JSON encoded string value of this matrix.
         """
-        ret = "["
-        for i in range(0, self.__rows):
-            for j in range(0, self.__cols):
-                if j == 0:
-                    ret += "["
-                ret += str(self.__matrix[i][j])
-                if j != self.__cols - 1:
-                    ret +=", "
-                if j == self.__cols - 1:
-                    ret += "]"
-            ret += "]," if i < self.__rows - 1 else "]"
-
-        return ret
+        return str(self.__matrix)
 
 class util:
     """
