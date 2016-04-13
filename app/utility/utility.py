@@ -14,10 +14,8 @@ def traverse(obj, visit):
 
     """
     for k, v in obj.items():
-        if not isinstance(v, dict):
-            visit(k,v)
-        else:
-            visit(k, None)
+        visit(k, v)
+        if isinstance(v, dict):
             traverse(obj[k], visit)
 
 def complement(A, B):

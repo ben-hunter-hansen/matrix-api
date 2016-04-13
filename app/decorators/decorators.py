@@ -68,20 +68,35 @@ def validate(request, schema):
     """
     def decorator(f):
         def wrapper(*args, **kwargs):
-            visitObjs = schema
+            # Object containing the deserialized payload,
+            # assuming it matches the schema structure and types.
             model = {}
 
+            # As the visitor function is invoked on nodes,
+            #
+            visitObjs = schema
+
             def visitor(k, v):
+
                 nonlocal visitObjs
-                parsed = None
-                if v is not None:
-                    parsed = json.loads(v)
-                    if isinstance(parsed, visitObjs[k]):
-                        model[k] = parsed
-                    else:
+                parsed = err = None
+
+                if isinstance(v, dict):
+                    try:
+                        visitObjs = visitObjs[k]
+                    except KeyError:
                         abort(422, {'required': str(schema), 'given': str(request.json)})
+                    finally:
+                        return
+                try:
+                    parsed = json.loads(v)
+                except TypeError:
+                    abort(422, {'required': str(schema), 'given': str(request.json)})
+
+                if isinstance(parsed, visitObjs[k]):
+                    model[k] = parsed
                 else:
-                    visitObjs = visitObjs[k]
+                    abort(422, {'required': str(schema), 'given': str(request.json)})
 
             app.utility.traverse(request.json, visitor)
 
