@@ -68,22 +68,22 @@ def validate(request, schema):
     """
     def decorator(f):
         def wrapper(*args, **kwargs):
-            try:
-                schemaProps, schemaTypes = app.utility.flatten(schema)
-                requestProps, requestPairs = app.utility.flatten(request.json)
-                complement = app.utility.complement(set(schemaProps), set(requestPairs.keys()))
-            except ValueError: # Malformed JSON
-                abort(400)
-
+            visitObjs = schema
             model = {}
 
-            for k in complement:
-                parsedValue = json.loads(requestPairs[k])
-                if isinstance(parsedValue, schemaTypes[k]):
-                    model[k] = parsedValue
+            def visitor(k, v):
+                nonlocal visitObjs
+                parsed = None
+                if v is not None:
+                    parsed = json.loads(v)
+                    if isinstance(parsed, visitObjs[k]):
+                        model[k] = parsed
+                    else:
+                        abort(422, {'required': str(schema), 'given': str(request.json)})
+                else:
+                    visitObjs = visitObjs[k]
 
-            if len(model.keys()) != len(complement): # Missing or invalid properties
-                abort(422, {'required': str(schema), 'given': str(request.json)})
+            app.utility.traverse(request.json, visitor)
 
             return f(model,*args, **kwargs)
         return wrapper

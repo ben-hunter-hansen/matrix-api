@@ -6,23 +6,19 @@ utility.py
 """
 import copy
 
-def flatten(nested, keys = [], values = {}):
+def traverse(obj, visit):
     """
-    Traverses a nested dictionary structure and
-    returns a list of the keys it contains, and
-    a dictionary of all key/value pairs where the value
-    is not itself another dictionary.
+    Traverses a nested dictionary,
+    invoking a visit function on
+    each key/value pair.
 
     """
-    for k, v in nested.items():
-        if k not in keys:
-            keys.append(k)
-        if isinstance(v, dict):
-            keys, values = flatten(v, keys, copy.deepcopy(values))
+    for k, v in obj.items():
+        if not isinstance(v, dict):
+            visit(k,v)
         else:
-            values[k] = v
-
-    return keys, values
+            visit(k, None)
+            traverse(obj[k], visit)
 
 def complement(A, B):
     """

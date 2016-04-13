@@ -8,18 +8,20 @@ Route handler for the determinant endpoint.
 POST /v1/determinant
 """
 
+
 from flask import Flask, Blueprint, abort, request, jsonify
+from app.decorators import validate
 from app.matrix import Matrix
+import app.schema
 
 determinant = Blueprint('determinant', __name__)
 
+@determinant.before_request
+@validate(request, app.schema.determinant)
+def computeDeterminant(model):
+    request.det = Matrix.fromArray(model['matrix']).determinant()
+
+
 @determinant.route('/v1/determinant', methods=["POST"])
 def postDeterminant():
-    if not request.json or not 'matrix' in request.json:
-        abort(400)
-
-    matrix = Matrix.fromArray(eval(request.json['matrix']))
-    result = {
-        'determinant': str(matrix.determinant())
-    }
-    return jsonify({'result': result})
+    return jsonify({ 'determinant': request.det })
