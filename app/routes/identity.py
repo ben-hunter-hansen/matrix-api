@@ -5,14 +5,22 @@ matrix-api v0.1
 identity.py
 
 Route handler for the identity endpoint.
-GET /v1/identity
+POST /v1/identity
 """
 
-from flask import Flask, Blueprint, request, jsonify
+from flask import Flask, Blueprint, abort, request, jsonify
+from app.decorators import validate
 from app.matrix import Matrix
+import app.schema
 
 identity = Blueprint('identity', __name__)
 
-@identity.route('/v1/identity')
+
+@identity.before_request
+@validate(request, app.schema.dimension)
+def buildIdentityMatrix(model):
+    request.identity = Matrix(model["rows"], model["columns"]).identity()
+
+@identity.route('/v1/identity', methods = ["POST"])
 def getIdentity():
-    return jsonify(Matrix.identity().toKeyValuePair('identity'))
+    return jsonify(request.identity.toKeyValuePair('identity'))

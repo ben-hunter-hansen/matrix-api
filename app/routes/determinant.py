@@ -17,7 +17,7 @@ import app.schema
 determinant = Blueprint('determinant', __name__)
 
 @determinant.before_request
-@validate(request, app.schema.determinant)
+@validate(request, app.schema.unaryop)
 def computeDeterminant(model):
     request.det = Matrix.fromArray(model['matrix']).determinant()
 

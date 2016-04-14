@@ -67,37 +67,43 @@ def validate(request, schema):
 
     """
     def decorator(f):
+
         def wrapper(*args, **kwargs):
+
             # Object containing the deserialized payload,
-            # assuming it matches the schema structure and types.
+            # assuming it matches the schema.
             model = {}
 
-            # As the visitor function is invoked on nodes,
-            #
-            visitObjs = schema
+            # As the request object is traversed, traverse the schema
+            # in parallel. The schema defines the exact structure and
+            # types required of the request object, so if they are not
+            # in parallel then the request is invalid.
+            visited = schema
 
             def visitor(k, v):
 
-                nonlocal visitObjs
+                nonlocal visited
                 parsed = err = None
 
-                if isinstance(v, dict):
+                if isinstance(v, dict): # Nested object
                     try:
-                        visitObjs = visitObjs[k]
-                    except KeyError:
+                        visited = visited[k] # Next level
+                    except KeyError: # Request is not structured correctly. Invalidate.
                         abort(422, {'required': str(schema), 'given': str(request.json)})
                     finally:
-                        return
-                try:
-                    parsed = json.loads(v)
-                except TypeError:
-                    abort(422, {'required': str(schema), 'given': str(request.json)})
+                        return # Bail out so the next level can be processed.
 
-                if isinstance(parsed, visitObjs[k]):
+                parsed = json.loads(v) if isinstance(v, str) else v
+
+                # visited[k] contains the required type specified by
+                # the schema. Either add it to the model if the types are correct,
+                # else invalidate.
+                if isinstance(parsed, visited[k]):
                     model[k] = parsed
                 else:
                     abort(422, {'required': str(schema), 'given': str(request.json)})
 
+            # Traverse the request structure.
             app.utility.traverse(request.json, visitor)
 
             return f(model,*args, **kwargs)

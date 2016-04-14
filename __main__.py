@@ -8,13 +8,14 @@ Application entry point.
 
 from flask import Flask, request, abort, json, after_this_request, jsonify
 from app.matrix import Matrix
-from app.routes import identity, determinant, multiply
+from app.routes import identity, determinant, multiply, add, sub
 
 api = Flask(__name__)
 api.register_blueprint(identity)
 api.register_blueprint(determinant)
 api.register_blueprint(multiply)
-
+api.register_blueprint(add)
+api.register_blueprint(sub)
 
 @api.errorhandler(422)
 def badRequest(error):

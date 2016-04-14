@@ -2,14 +2,15 @@
 matrix-api v0.1
 @author Ben Hansen
 @created on 04/11/2016
-identity.py
+dimension.py
 
-JSON Schema for the identity endpoint. Specifies the structure
+JSON Schema for endpoints that accept matrix
+dimensions. Specifies the structure
 and types required in order for the request body to
 be considered valid.
 """
 
-identity = {
+dimension = {
     "rows": int,
     "columns": int
 }

@@ -4,11 +4,12 @@ matrix-api v0.1
 @created on 04/11/2016
 determinant.py
 
-JSON Schema for the determinant endpoint. Specifies the structure
+JSON Schema for endpoints that perform unary
+matrix operations. Specifies the structure
 and types required in order for the request body to
 be considered valid.
 """
 
-determinant = {
+unaryop = {
     'matrix': list
 }
